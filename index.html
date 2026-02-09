@@ -274,13 +274,6 @@
             padding: 20px;
             margin-top: 20px;
             border-left: 5px solid #2ecc71;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.2); }
-            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
         }
         
         .decision-text {
@@ -313,7 +306,7 @@
             position: absolute;
             padding: 12px 18px;
             border-radius: 10px;
-            min-width: 180px;
+            width: 200px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -443,15 +436,15 @@
                 
                 <div class="tree-stats">
                     <div class="stat">
-                        <div class="stat-value" id="nodeCount">0</div>
+                        <div class="stat-value" id="nodeCount">21</div>
                         <div class="stat-label">Nodos Totales</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-value" id="levelCount">0</div>
+                        <div class="stat-value" id="levelCount">4</div>
                         <div class="stat-label">Niveles</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-value" id="pathCount">0</div>
+                        <div class="stat-value" id="pathCount">12</div>
                         <div class="stat-label">Caminos Posibles</div>
                     </div>
                     <div class="stat">
@@ -536,7 +529,7 @@
     <div class="tooltip" id="nodeTooltip"></div>
 
     <script>
-        // Estructura del árbol de decisiones más complejo
+        // Estructura del árbol de decisiones
         const decisionTree = {
             id: "root",
             name: "Inicio de Proyecto",
@@ -544,13 +537,13 @@
             type: "root",
             children: [
                 {
-                    id: "approach_agile",
+                    id: "agile",
                     name: "Enfoque Ágil",
                     description: "Metodología iterativa e incremental",
                     type: "option",
                     children: [
                         {
-                            id: "agile_team_small",
+                            id: "team_small",
                             name: "Equipo Pequeño",
                             description: "Equipo de 3-5 personas",
                             type: "option",
@@ -562,7 +555,7 @@
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result_agile_success",
+                                            id: "result1",
                                             name: "Alta Adaptabilidad",
                                             description: "Proyecto exitoso con capacidad de adaptación a cambios",
                                             type: "result",
@@ -578,7 +571,7 @@
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result_agile_stable",
+                                            id: "result2",
                                             name: "Resultado Estable",
                                             description: "Proyecto entregado con funcionalidades sólidas",
                                             type: "result",
@@ -590,19 +583,19 @@
                             ]
                         },
                         {
-                            id: "agile_team_large",
+                            id: "team_large",
                             name: "Equipo Grande",
                             description: "Equipo de 6-10 personas",
                             type: "option",
                             children: [
                                 {
-                                    id: "scaled_framework",
+                                    id: "scaled",
                                     name: "Agile Escalado",
                                     description: "Framework SAFe o LeSS",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result_agile_complex",
+                                            id: "result3",
                                             name: "Complejidad Controlada",
                                             description: "Proyecto complejo gestionado efectivamente",
                                             type: "result",
@@ -612,13 +605,13 @@
                                     ]
                                 },
                                 {
-                                    id: "hybrid_approach",
+                                    id: "hybrid",
                                     name: "Enfoque Híbrido",
                                     description: "Combinación de metodologías",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result_agile_flex",
+                                            id: "result4",
                                             name: "Flexibilidad Moderada",
                                             description: "Resultados variables dependiendo de la integración",
                                             type: "result",
@@ -632,25 +625,25 @@
                     ]
                 },
                 {
-                    id: "approach_traditional",
+                    id: "traditional",
                     name: "Enfoque Tradicional",
                     description: "Metodología en cascada (Waterfall)",
                     type: "option",
                     children: [
                         {
-                            id: "planning_detailed",
+                            id: "detailed",
                             name: "Planificación Detallada",
                             description: "Documentación exhaustiva antes de comenzar",
                             type: "option",
                             children: [
                                 {
-                                    id: "phases_strict",
+                                    id: "strict",
                                     name: "Fases Estrictas",
                                     description: "Secuencia lineal de fases",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result_trad_predictable",
+                                            id: "result5",
                                             name: "Resultado Predecible",
                                             description: "Proyecto entregado según lo planeado, pero sin flexibilidad",
                                             type: "result",
@@ -660,145 +653,17 @@
                                     ]
                                 },
                                 {
-                                    id: "phases_flexible",
+                                    id: "flexible",
                                     name: "Fases Flexibles",
                                     description: "Alguna adaptación entre fases",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result_trad_balanced",
+                                            id: "result6",
                                             name: "Control con Adaptación",
                                             description: "Balance entre estructura y adaptabilidad",
                                             type: "result",
                                             risk: "Medio",
-                                            success: "Medio"
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            id: "planning_moderate",
-                            name: "Planificación Moderada",
-                            description: "Documentación esencial, detalles emergentes",
-                            type: "option",
-                            children: [
-                                {
-                                    id: "stage_gates",
-                                    name: "Revisiones por Etapas",
-                                    description: "Puntos de control entre fases",
-                                    type: "option",
-                                    children: [
-                                        {
-                                            id: "result_trad_progress",
-                                            name: "Progreso Controlado",
-                                            description: "Avance constante con monitoreo regular",
-                                            type: "result",
-                                            risk: "Medio",
-                                            success: "Alto"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "incremental_delivery",
-                                    name: "Entrega Incremental",
-                                    description: "Entregas parciales del proyecto",
-                                    type: "option",
-                                    children: [
-                                        {
-                                            id: "result_trad_feedback",
-                                            name: "Retroalimentación Temprana",
-                                            description: "Aprendizaje continuo y ajustes progresivos",
-                                            type: "result",
-                                            risk: "Bajo",
-                                            success: "Alto"
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    id: "approach_radical",
-                    name: "Enfoque Radical",
-                    description: "Metodologías disruptivas e innovadoras",
-                    type: "option",
-                    children: [
-                        {
-                            id: "design_thinking",
-                            name: "Design Thinking",
-                            description: "Centrado en el usuario y prototipado rápido",
-                            type: "option",
-                            children: [
-                                {
-                                    id: "rapid_prototyping",
-                                    name: "Prototipado Rápido",
-                                    description: "Iteraciones muy rápidas de diseño",
-                                    type: "option",
-                                    children: [
-                                        {
-                                            id: "result_radical_innovative",
-                                            name: "Innovación Exitosa",
-                                            description: "Solución altamente innovadora y centrada en usuario",
-                                            type: "result",
-                                            risk: "Alto",
-                                            success: "Alto"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "user_centric",
-                                    name: "Totalmente Centrado en Usuario",
-                                    description: "Todo gira alrededor de la experiencia de usuario",
-                                    type: "option",
-                                    children: [
-                                        {
-                                            id: "result_radical_experience",
-                                            name: "Experiencia Excepcional",
-                                            description: "Producto con experiencia de usuario sobresaliente",
-                                            type: "result",
-                                            risk: "Medio",
-                                            success: "Alto"
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            id: "lean_startup",
-                            name: "Lean Startup",
-                            description: "Construir-medir-aprender, MVP",
-                            type: "option",
-                            children: [
-                                {
-                                    id: "mvp_minimal",
-                                    name: "MVP Mínimo",
-                                    description: "Producto mínimo viable extremo",
-                                    type: "option",
-                                    children: [
-                                        {
-                                            id: "result_radical_validation",
-                                            name: "Validación Rápida",
-                                            description: "Aprendizaje acelerado sobre viabilidad",
-                                            type: "result",
-                                            risk: "Medio",
-                                            success: "Medio"
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: "pivot_ready",
-                                    name: "Preparado para Pivotar",
-                                    description: "Equipo flexible para cambios radicales",
-                                    type: "option",
-                                    children: [
-                                        {
-                                            id: "result_radical_adaptation",
-                                            name: "Adaptación Extrema",
-                                            description: "Capacidad de cambiar dirección completamente si es necesario",
-                                            type: "result",
-                                            risk: "Alto",
                                             success: "Medio"
                                         }
                                     ]
@@ -814,21 +679,24 @@
         let currentPath = [];
         let isDecisionActive = false;
         let currentNode = null;
-        let scale = 1;
-        let offsetX = 0, offsetY = 0;
-        let nodeElements = [];
-        let connectorElements = [];
 
         // Elementos del DOM
         const treeContainer = document.getElementById('treeVisualization');
         const nodeTooltip = document.getElementById('nodeTooltip');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const autoBtn = document.getElementById('autoBtn');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+        const centerBtn = document.getElementById('centerBtn');
+        const example1Btn = document.getElementById('example1Btn');
+        const example2Btn = document.getElementById('example2Btn');
+        const example3Btn = document.getElementById('example3Btn');
 
         // Inicializar el árbol
         function initTree() {
             // Limpiar el contenedor
             treeContainer.innerHTML = '';
-            nodeElements = [];
-            connectorElements = [];
             
             // Calcular dimensiones
             const containerWidth = treeContainer.clientWidth;
@@ -839,23 +707,14 @@
             const rootY = 80;
             
             // Crear nodo raíz
-            createTreeNode(decisionTree, rootX, rootY, 0);
+            createTreeNode(decisionTree, rootX, rootY);
             
             // Renderizar recursivamente
             renderTreeNodes(decisionTree, rootX, rootY, 0, containerWidth);
-            
-            // Dibujar conectores después de crear todos los nodos
-            drawConnectors();
-            
-            // Actualizar estadísticas
-            updateStats();
-            
-            // Aplicar transformación inicial
-            updateTreeTransform();
         }
 
         // Crear un nodo del árbol
-        function createTreeNode(node, x, y, level) {
+        function createTreeNode(node, x, y) {
             const nodeElement = document.createElement('div');
             nodeElement.className = `tree-node ${node.type}`;
             nodeElement.id = `node-${node.id}`;
@@ -864,7 +723,7 @@
             
             nodeElement.innerHTML = `
                 <div class="node-title">${node.name}</div>
-                <div class="node-desc">${node.description.substring(0, 40)}${node.description.length > 40 ? '...' : ''}</div>
+                <div class="node-desc">${node.description}</div>
             `;
             
             // Añadir eventos
@@ -873,14 +732,6 @@
             nodeElement.addEventListener('mouseleave', hideNodeTooltip);
             
             treeContainer.appendChild(nodeElement);
-            nodeElements.push({
-                element: nodeElement,
-                node: node,
-                x: x,
-                y: y,
-                width: 180,
-                height: 70
-            });
             
             return nodeElement;
         }
@@ -900,78 +751,58 @@
                 const childX = startX + (index * nodeSpacing);
                 const childY = parentY + levelSpacing;
                 
-                createTreeNode(child, childX, childY, level + 1);
+                createTreeNode(child, childX, childY);
+                
+                // Dibujar conector
+                drawConnector(parentX, parentY, childX, childY);
                 
                 // Renderizar hijos recursivamente
                 renderTreeNodes(child, childX, childY, level + 1, nodeSpacing);
             });
         }
 
-        // Dibujar conectores entre nodos
-        function drawConnectors() {
-            nodeElements.forEach(nodeItem => {
-                const node = nodeItem.node;
-                
-                if (node.children && node.children.length > 0) {
-                    node.children.forEach(child => {
-                        const childElement = nodeElements.find(n => n.node.id === child.id);
-                        if (childElement) {
-                            // Crear conector vertical
-                            const verticalConnector = document.createElement('div');
-                            verticalConnector.className = 'tree-connector vertical';
-                            
-                            const startY = nodeItem.y + 70; // Altura del nodo
-                            const endY = childElement.y - 10;
-                            const height = endY - startY;
-                            
-                            verticalConnector.style.left = `${nodeItem.x + 90}px`;
-                            verticalConnector.style.top = `${startY}px`;
-                            verticalConnector.style.height = `${height}px`;
-                            verticalConnector.style.width = '3px';
-                            
-                            treeContainer.appendChild(verticalConnector);
-                            connectorElements.push(verticalConnector);
-                            
-                            // Crear conector horizontal
-                            const horizontalConnector = document.createElement('div');
-                            horizontalConnector.className = 'tree-connector horizontal';
-                            
-                            const startX = nodeItem.x + 90;
-                            const endX = childElement.x + 90;
-                            const width = endX - startX;
-                            
-                            horizontalConnector.style.left = `${startX}px`;
-                            horizontalConnector.style.top = `${childElement.y - 10}px`;
-                            horizontalConnector.style.width = `${Math.abs(width)}px`;
-                            horizontalConnector.style.height = '3px';
-                            
-                            if (width < 0) {
-                                horizontalConnector.style.left = `${endX}px`;
-                            }
-                            
-                            treeContainer.appendChild(horizontalConnector);
-                            connectorElements.push(horizontalConnector);
-                        }
-                    });
-                }
-            });
+        // Dibujar conector entre nodos
+        function drawConnector(fromX, fromY, toX, toY) {
+            // Calcular puntos
+            const startX = fromX + 100;
+            const startY = fromY + 50;
+            const endX = toX + 100;
+            const endY = toY;
+            
+            // Crear línea vertical desde el nodo padre
+            const verticalLine = document.createElement('div');
+            verticalLine.className = 'tree-connector vertical';
+            verticalLine.style.left = `${startX}px`;
+            verticalLine.style.top = `${startY}px`;
+            verticalLine.style.height = `${Math.abs(endY - startY)}px`;
+            verticalLine.style.width = '3px';
+            
+            // Crear línea horizontal hacia el nodo hijo
+            const horizontalLine = document.createElement('div');
+            horizontalLine.className = 'tree-connector horizontal';
+            horizontalLine.style.left = `${Math.min(startX, endX)}px`;
+            horizontalLine.style.top = `${endY}px`;
+            horizontalLine.style.width = `${Math.abs(endX - startX)}px`;
+            horizontalLine.style.height = '3px';
+            
+            treeContainer.appendChild(verticalLine);
+            treeContainer.appendChild(horizontalLine);
         }
 
         // Manejar clic en nodo
         function handleNodeClick(node) {
             if (!isDecisionActive && node.type !== "root") {
-                showMessage("Primero inicia una decisión con el botón 'Iniciar Decisión'", "info");
+                showMessage("Primero inicia una decisión con el botón 'Iniciar Decisión'");
+                return;
+            }
+            
+            if (node.type === "root" && !isDecisionActive) {
+                showMessage("Haz clic en 'Iniciar Decisión' para comenzar");
                 return;
             }
             
             // Si no es una opción o resultado, no hacer nada
             if (node.type !== "option" && node.type !== "result") return;
-            
-            // Verificar que el nodo sea hijo del nodo actual o sea el primer paso
-            if (currentNode && !isValidNextNode(currentNode, node)) {
-                showMessage("Debes seguir el camino del árbol. Selecciona una opción del nodo actual.", "warning");
-                return;
-            }
             
             // Añadir al camino
             currentPath.push({
@@ -990,41 +821,13 @@
             // Actualizar interfaz
             updateDecisionPath();
             updateCurrentDecision();
+            updateStats();
             
             // Si es resultado, finalizar decisión
             if (node.type === "result") {
                 isDecisionActive = false;
-                showMessage(`¡Decisión completada! Resultado: ${node.name}. Riesgo: ${node.risk}, Éxito: ${node.success}`, "success");
+                showMessage(`¡Decisión completada! Resultado: ${node.name}. Riesgo: ${node.risk}, Éxito: ${node.success}`);
             }
-            
-            updateStats();
-        }
-
-        // Verificar si el nodo es un siguiente paso válido
-        function isValidNextNode(currentNode, nextNode) {
-            // Si no hay nodo actual, cualquier nodo es válido
-            if (!currentNode) return true;
-            
-            // Buscar si el nextNode es hijo de currentNode en la estructura
-            function isChildOf(parentNode, childNode) {
-                if (!parentNode.children) return false;
-                
-                // Verificar hijos directos
-                if (parentNode.children.some(child => child.id === childNode.id)) {
-                    return true;
-                }
-                
-                // Verificar hijos recursivamente
-                for (let child of parentNode.children) {
-                    if (isChildOf(child, childNode)) {
-                        return true;
-                    }
-                }
-                
-                return false;
-            }
-            
-            return isChildOf(currentNode, nextNode);
         }
 
         // Resaltar camino actual
@@ -1032,10 +835,6 @@
             // Remover resaltado previo
             document.querySelectorAll('.tree-node.active').forEach(node => {
                 node.classList.remove('active');
-            });
-            
-            document.querySelectorAll('.tree-connector.active').forEach(connector => {
-                connector.classList.remove('active');
             });
             
             // Resaltar nodos en el camino
@@ -1104,4 +903,224 @@
                 `;
             });
             
-            pathContainer.innerHTML
+            pathContainer.innerHTML = pathHTML;
+            pathContainer.scrollTop = pathContainer.scrollHeight;
+        }
+
+        // Actualizar decisión actual
+        function updateCurrentDecision() {
+            const currentDecisionElement = document.getElementById("currentDecision");
+            
+            if (!isDecisionActive) {
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Estado:</strong> Esperando inicio de decisión. Haz clic en "Iniciar Decisión" para comenzar.
+                    </div>
+                `;
+                return;
+            }
+            
+            if (currentPath.length === 0) {
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-play-circle"></i> 
+                        <strong>Decisión iniciada:</strong> Selecciona tu primer paso en el árbol de decisiones.
+                    </div>
+                `;
+                return;
+            }
+            
+            const lastStep = currentPath[currentPath.length - 1];
+            
+            if (lastStep.type === "result") {
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-flag-checkered"></i> 
+                        <strong>Decisión completada:</strong> Has llegado al resultado final: 
+                        <span class="result-text">"${lastStep.name}"</span>
+                    </div>
+                `;
+            } else {
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-question-circle"></i> 
+                        <strong>Paso actual:</strong> "${lastStep.name}". 
+                        <strong>Descripción:</strong> ${lastStep.description}
+                    </div>
+                `;
+            }
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            document.getElementById('decisionStep').textContent = currentPath.length;
+        }
+
+        // Mostrar mensaje
+        function showMessage(message) {
+            alert(message);
+        }
+
+        // Iniciar decisión
+        function startDecision() {
+            isDecisionActive = true;
+            currentPath = [];
+            currentNode = null;
+            updateDecisionPath();
+            updateCurrentDecision();
+            updateStats();
+            
+            // Remover resaltado previo
+            document.querySelectorAll('.tree-node.active').forEach(node => {
+                node.classList.remove('active');
+            });
+            
+            showMessage("¡Decisión iniciada! Ahora puedes seleccionar opciones en el árbol.");
+        }
+
+        // Reiniciar todo
+        function resetDecision() {
+            isDecisionActive = false;
+            currentPath = [];
+            currentNode = null;
+            updateDecisionPath();
+            updateCurrentDecision();
+            updateStats();
+            
+            // Remover resaltado
+            document.querySelectorAll('.tree-node.active').forEach(node => {
+                node.classList.remove('active');
+            });
+        }
+
+        // Recorrido automático
+        function autoTraverse() {
+            resetDecision();
+            startDecision();
+            
+            // Simular un camino predeterminado
+            setTimeout(() => {
+                // Seleccionar Enfoque Ágil
+                simulateClick('agile');
+                
+                setTimeout(() => {
+                    // Seleccionar Equipo Pequeño
+                    simulateClick('team_small');
+                    
+                    setTimeout(() => {
+                        // Seleccionar Sprints Cortos
+                        simulateClick('sprints_short');
+                        
+                        setTimeout(() => {
+                            // Seleccionar resultado final
+                            simulateClick('result1');
+                        }, 800);
+                    }, 800);
+                }, 800);
+            }, 500);
+        }
+
+        // Simular clic en un nodo
+        function simulateClick(nodeId) {
+            const node = findNodeById(decisionTree, nodeId);
+            if (node) {
+                handleNodeClick(node);
+            }
+        }
+
+        // Buscar nodo por ID
+        function findNodeById(tree, id) {
+            if (tree.id === id) return tree;
+            
+            if (tree.children) {
+                for (let child of tree.children) {
+                    const found = findNodeById(child, id);
+                    if (found) return found;
+                }
+            }
+            
+            return null;
+        }
+
+        // Ejemplos de caminos
+        function example1() {
+            resetDecision();
+            startDecision();
+            
+            setTimeout(() => {
+                simulateClick('agile');
+                setTimeout(() => {
+                    simulateClick('team_small');
+                    setTimeout(() => {
+                        simulateClick('sprints_short');
+                        setTimeout(() => {
+                            simulateClick('result1');
+                        }, 600);
+                    }, 600);
+                }, 600);
+            }, 500);
+        }
+
+        function example2() {
+            resetDecision();
+            startDecision();
+            
+            setTimeout(() => {
+                simulateClick('agile');
+                setTimeout(() => {
+                    simulateClick('team_large');
+                    setTimeout(() => {
+                        simulateClick('hybrid');
+                        setTimeout(() => {
+                            simulateClick('result4');
+                        }, 600);
+                    }, 600);
+                }, 600);
+            }, 500);
+        }
+
+        function example3() {
+            resetDecision();
+            startDecision();
+            
+            setTimeout(() => {
+                simulateClick('traditional');
+                setTimeout(() => {
+                    simulateClick('detailed');
+                    setTimeout(() => {
+                        simulateClick('flexible');
+                        setTimeout(() => {
+                            simulateClick('result6');
+                        }, 600);
+                    }, 600);
+                }, 600);
+            }, 500);
+        }
+
+        // Configurar eventos
+        startBtn.addEventListener('click', startDecision);
+        resetBtn.addEventListener('click', resetDecision);
+        autoBtn.addEventListener('click', autoTraverse);
+        example1Btn.addEventListener('click', example1);
+        example2Btn.addEventListener('click', example2);
+        example3Btn.addEventListener('click', example3);
+        
+        zoomInBtn.addEventListener('click', () => {
+            treeContainer.style.transform = `scale(${1.2})`;
+        });
+        
+        zoomOutBtn.addEventListener('click', () => {
+            treeContainer.style.transform = `scale(${0.8})`;
+        });
+        
+        centerBtn.addEventListener('click', () => {
+            treeContainer.style.transform = 'scale(1)';
+            treeContainer.scrollLeft = treeContainer.scrollWidth / 2 - treeContainer.clientWidth / 2;
+        });
+
+        // Inicializar cuando la página cargue
+        window.addEventListener('load', initTree);
+    </script>
+</body>
+</html>
