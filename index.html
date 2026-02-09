@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Árbol de Decisiones Interactivo</title>
+    <title>Árbol de Decisiones Ramificado</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,777 +14,1075 @@
         }
         
         body {
-            background-color: #f0f7ff;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #333;
             line-height: 1.6;
             padding: 20px;
+            min-height: 100vh;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
         }
         
         header {
             text-align: center;
-            padding: 20px 0;
+            padding: 25px 0;
             margin-bottom: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
         
         h1 {
             color: #2c3e50;
             margin-bottom: 10px;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .subtitle {
             color: #7f8c8d;
             font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .main-content {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr 350px;
             gap: 30px;
+            margin-bottom: 40px;
         }
         
-        .decision-tree-section {
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .tree-section {
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             padding: 25px;
-            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tree-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, #3498db, #2ecc71);
         }
         
         .section-title {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: #3498db;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+            gap: 12px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.6rem;
         }
         
         .section-title i {
+            color: #3498db;
             font-size: 1.8rem;
         }
         
         .tree-container {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 400px;
-            overflow-x: auto;
+            width: 100%;
+            overflow: auto;
             padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            min-height: 600px;
+            position: relative;
         }
         
-        .tree {
+        #treeVisualization {
+            width: 100%;
+            height: 100%;
+            min-height: 600px;
             position: relative;
+        }
+        
+        .controls-sidebar {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 25px;
         }
         
-        .tree-node {
-            background-color: #fff;
-            border: 2px solid #3498db;
-            border-radius: 10px;
-            padding: 15px 25px;
-            margin: 10px;
-            width: 220px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .tree-node:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
-        }
-        
-        .tree-node.root {
-            background-color: #3498db;
-            color: white;
-            border-color: #2980b9;
-        }
-        
-        .tree-node.option {
-            background-color: #f8f9fa;
-            border-color: #2ecc71;
-        }
-        
-        .tree-node.result {
-            background-color: #fff9e6;
-            border-color: #f39c12;
-        }
-        
-        .node-title {
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-        
-        .node-content {
-            font-size: 0.95rem;
-            color: #555;
-        }
-        
-        .tree-level {
+        .controls-section {
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-            position: relative;
-        }
-        
-        .connectors {
-            position: absolute;
-            top: -30px;
-            width: 100%;
-            height: 30px;
-        }
-        
-        .connector {
-            position: absolute;
-            height: 30px;
-            width: 2px;
-            background-color: #3498db;
-            top: -30px;
-        }
-        
-        .connector.horizontal {
-            width: 100px;
-            height: 2px;
-            top: 0;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
+            flex-direction: column;
             gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
+        }
+        
+        .controls-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
         }
         
         .btn {
-            padding: 12px 24px;
+            padding: 14px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
             font-size: 1rem;
+            width: 100%;
+            text-align: center;
         }
         
         .btn-primary {
-            background-color: #3498db;
+            background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
         }
         
         .btn-primary:hover {
-            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
         }
         
         .btn-secondary {
-            background-color: #e74c3c;
+            background: linear-gradient(to right, #e74c3c, #c0392b);
             color: white;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
         }
         
         .btn-secondary:hover {
-            background-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
         }
         
         .btn-success {
-            background-color: #2ecc71;
+            background: linear-gradient(to right, #2ecc71, #27ae60);
             color: white;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
         }
         
         .btn-success:hover {
-            background-color: #27ae60;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn-info {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            color: white;
+            box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+        }
+        
+        .btn-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(155, 89, 182, 0.4);
         }
         
         .decision-path {
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             padding: 25px;
             margin-top: 20px;
         }
         
         .path-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
         }
         
-        .path-steps {
+        .path-title i {
+            color: #3498db;
+        }
+        
+        .path-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
         
         .path-step {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
+            gap: 12px;
+            padding: 15px;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            transition: all 0.3s ease;
+        }
+        
+        .path-step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
         }
         
         .step-number {
-            background-color: #3498db;
+            background: #3498db;
             color: white;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            flex-shrink: 0;
         }
         
-        .current-path {
-            font-weight: bold;
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        .step-question {
+            font-weight: 600;
             color: #2c3e50;
-            padding: 15px;
-            background-color: #e8f4fc;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #2ecc71;
+            margin-bottom: 5px;
+        }
+        
+        .step-choice {
+            color: #27ae60;
+            font-style: italic;
+        }
+        
+        .current-decision {
+            background: linear-gradient(to right, #e8f4fc, #d4e6f1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #2ecc71;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.2); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+        
+        .decision-text {
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .decision-text strong {
+            color: #3498db;
+        }
+        
+        .result-text {
+            color: #e74c3c;
+            font-weight: bold;
         }
         
         footer {
             text-align: center;
             margin-top: 40px;
             color: #7f8c8d;
-            padding: 20px;
-            font-size: 0.9rem;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
         }
         
-        @media (max-width: 768px) {
-            .tree-level {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .tree-node {
-                width: 90%;
-                max-width: 300px;
-            }
-            
-            .connector.horizontal {
-                display: none;
-            }
-            
-            .connector {
-                display: none;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
+        /* Estilos para nodos del árbol */
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .node circle {
+            stroke-width: 3px;
+        }
+        
+        .node text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .node.root circle {
+            fill: #3498db;
+            stroke: #2980b9;
+        }
+        
+        .node.option circle {
+            fill: #2ecc71;
+            stroke: #27ae60;
+        }
+        
+        .node.result circle {
+            fill: #e74c3c;
+            stroke: #c0392b;
+        }
+        
+        .node.active circle {
+            fill: #f39c12;
+            stroke: #e67e22;
+            filter: drop-shadow(0 0 5px rgba(243, 156, 18, 0.7));
+        }
+        
+        .link {
+            fill: none;
+            stroke: #95a5a6;
+            stroke-width: 2px;
+        }
+        
+        .link.active {
+            stroke: #3498db;
+            stroke-width: 3px;
+        }
+        
+        /* Tooltip personalizado */
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 100;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tree-stats {
+            display: flex;
+            justify-content: space-between;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-sitemap"></i> Árbol de Decisiones Interactivo</h1>
-            <p class="subtitle">Visualiza y navega por un modelo de decisiones paso a paso</p>
+            <h1><i class="fas fa-network-wired"></i> Árbol de Decisiones Ramificado</h1>
+            <p class="subtitle">Explora un modelo de árbol de decisiones complejo con múltiples ramas horizontales y visualización interactiva</p>
         </header>
         
         <div class="main-content">
-            <section class="decision-tree-section">
+            <section class="tree-section">
                 <div class="section-title">
                     <i class="fas fa-project-diagram"></i>
-                    <h2>Modelo de Decisión: Elegir una Actividad para el Fin de Semana</h2>
+                    <h2>Árbol de Decisiones: Planificación de Proyectos</h2>
                 </div>
                 
                 <div class="tree-container">
-                    <div class="tree" id="decisionTree">
-                        <!-- El árbol se generará con JavaScript -->
-                    </div>
+                    <svg id="treeVisualization" width="100%" height="100%"></svg>
                 </div>
                 
-                <div class="controls">
-                    <button class="btn btn-primary" id="startBtn">
-                        <i class="fas fa-play-circle"></i> Comenzar Decisión
-                    </button>
-                    <button class="btn btn-secondary" id="resetBtn">
-                        <i class="fas fa-redo"></i> Reiniciar
-                    </button>
-                    <button class="btn btn-success" id="exampleBtn">
-                        <i class="fas fa-question-circle"></i> Ver Ejemplo Completo
-                    </button>
+                <div class="tree-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="nodeCount">0</div>
+                        <div class="stat-label">Nodos Totales</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="levelCount">0</div>
+                        <div class="stat-label">Niveles</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="pathCount">0</div>
+                        <div class="stat-label">Caminos Posibles</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="decisionStep">0</div>
+                        <div class="stat-label">Paso Actual</div>
+                    </div>
                 </div>
             </section>
             
-            <section class="decision-path">
-                <h3 class="path-title">Tu Camino de Decisión</h3>
-                <div class="path-steps" id="decisionPath">
-                    <!-- Los pasos se agregarán con JavaScript -->
-                    <div class="path-step empty-path">
-                        <div class="step-number">?</div>
-                        <div>Haz clic en "Comenzar Decisión" para iniciar</div>
-                    </div>
+            <aside class="controls-sidebar">
+                <div class="controls-section">
+                    <h3 class="controls-title"><i class="fas fa-cogs"></i> Controles</h3>
+                    <button class="btn btn-primary" id="startBtn">
+                        <i class="fas fa-play-circle"></i> Iniciar Decisión
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo-alt"></i> Reiniciar Todo
+                    </button>
+                    <button class="btn btn-success" id="autoBtn">
+                        <i class="fas fa-robot"></i> Recorrido Automático
+                    </button>
                 </div>
                 
-                <div class="current-path" id="currentDecision">
-                    Esperando tu primera decisión...
+                <div class="controls-section">
+                    <h3 class="controls-title"><i class="fas fa-eye"></i> Vista</h3>
+                    <button class="btn btn-info" id="zoomInBtn">
+                        <i class="fas fa-search-plus"></i> Acercar
+                    </button>
+                    <button class="btn btn-info" id="zoomOutBtn">
+                        <i class="fas fa-search-minus"></i> Alejar
+                    </button>
+                    <button class="btn btn-info" id="centerBtn">
+                        <i class="fas fa-expand-arrows-alt"></i> Centrar Árbol
+                    </button>
                 </div>
-            </section>
+                
+                <div class="controls-section">
+                    <h3 class="controls-title"><i class="fas fa-bolt"></i> Ejemplos Rápidos</h3>
+                    <button class="btn btn-success" id="example1Btn">
+                        <i class="fas fa-chart-line"></i> Camino Exitoso
+                    </button>
+                    <button class="btn btn-secondary" id="example2Btn">
+                        <i class="fas fa-exclamation-triangle"></i> Camino Riesgoso
+                    </button>
+                    <button class="btn btn-primary" id="example3Btn">
+                        <i class="fas fa-balance-scale"></i> Camino Equilibrado
+                    </button>
+                </div>
+                
+                <div class="current-decision" id="currentDecision">
+                    <div class="decision-text">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Estado:</strong> Esperando inicio de decisión. Haz clic en "Iniciar Decisión" para comenzar.
+                    </div>
+                </div>
+            </aside>
         </div>
         
+        <section class="decision-path">
+            <div class="path-title">
+                <i class="fas fa-road"></i>
+                <h3>Camino de Decisión Seleccionado</h3>
+            </div>
+            
+            <div class="path-container" id="decisionPath">
+                <div class="path-step">
+                    <div class="step-number">?</div>
+                    <div class="step-content">
+                        <div class="step-question">Sin decisiones tomadas aún</div>
+                        <div class="step-choice">Selecciona una opción en el árbol para comenzar</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
         <footer>
-            <p>Modelo de Árbol de Decisiones Interactivo &copy; 2023</p>
-            <p>Este modelo ilustra cómo funciona un árbol de decisiones para elegir actividades de fin de semana.</p>
+            <p><strong>Árbol de Decisiones Ramificado</strong> &copy; 2023 - Visualización Interactiva</p>
+            <p>Este modelo representa un árbol de decisiones complejo para planificación de proyectos con múltiples ramificaciones horizontales.</p>
         </footer>
     </div>
 
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
-        // Definición del árbol de decisiones
+        // Estructura del árbol de decisiones más complejo
         const decisionTree = {
-            id: 1,
-            question: "¿Cómo está el clima este fin de semana?",
+            id: "root",
+            name: "Inicio de Proyecto",
+            description: "Decide cómo abordar un nuevo proyecto",
             type: "root",
-            options: [
+            children: [
                 {
-                    id: 2,
-                    choice: "Soleado",
-                    next: {
-                        question: "¿Te gustan las actividades al aire libre?",
-                        type: "option",
-                        options: [
-                            {
-                                id: 3,
-                                choice: "Sí",
-                                next: {
-                                    question: "¿Prefieres playa o montaña?",
+                    id: "approach",
+                    name: "Enfoque Ágil",
+                    description: "Metodología iterativa e incremental",
+                    type: "option",
+                    children: [
+                        {
+                            id: "agile_team",
+                            name: "Equipo Pequeño",
+                            description: "Equipo de 3-5 personas",
+                            type: "option",
+                            children: [
+                                {
+                                    id: "small_sprints",
+                                    name: "Sprints Cortos",
+                                    description: "Iteraciones de 1-2 semanas",
                                     type: "option",
-                                    options: [
+                                    children: [
                                         {
-                                            id: 4,
-                                            choice: "Playa",
-                                            result: "Ve a la playa. No olvides protector solar y una toalla.",
-                                            type: "result"
-                                        },
+                                            id: "result1",
+                                            name: "Alta Adaptabilidad",
+                                            description: "Proyecto exitoso con capacidad de adaptación a cambios",
+                                            type: "result",
+                                            risk: "Bajo",
+                                            success: "Alto"
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "medium_sprints",
+                                    name: "Sprints Medios",
+                                    description: "Iteraciones de 3-4 semanas",
+                                    type: "option",
+                                    children: [
                                         {
-                                            id: 5,
-                                            choice: "Montaña",
-                                            result: "Haz una caminata en la montaña. Lleva calzado adecuado y agua.",
-                                            type: "result"
+                                            id: "result2",
+                                            name: "Resultado Estable",
+                                            description: "Proyecto entregado con funcionalidades sólidas",
+                                            type: "result",
+                                            risk: "Medio",
+                                            success: "Alto"
                                         }
                                     ]
                                 }
-                            },
-                            {
-                                id: 6,
-                                choice: "No",
-                                result: "Organiza un picnic en el parque con amigos. Lleva comida y juegos de mesa.",
-                                type: "result"
-                            }
-                        ]
-                    }
+                            ]
+                        },
+                        {
+                            id: "agile_large_team",
+                            name: "Equipo Grande",
+                            description: "Equipo de 6-10 personas",
+                            type: "option",
+                            children: [
+                                {
+                                    id: "scaled_agile",
+                                    name: "Agile Escalado",
+                                    description: "Framework SAFe o LeSS",
+                                    type: "option",
+                                    children: [
+                                        {
+                                            id: "result3",
+                                            name: "Complejidad Controlada",
+                                            description: "Proyecto complejo gestionado efectivamente",
+                                            type: "result",
+                                            risk: "Medio",
+                                            success: "Medio"
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "hybrid_approach",
+                                    name: "Enfoque Híbrido",
+                                    description: "Combinación de metodologías",
+                                    type: "option",
+                                    children: [
+                                        {
+                                            id: "result4",
+                                            name: "Flexibilidad Moderada",
+                                            description: "Resultados variables dependiendo de la integración",
+                                            type: "result",
+                                            risk: "Alto",
+                                            success: "Medio"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    id: 7,
-                    choice: "Lluvioso",
-                    next: {
-                        question: "¿Prefieres actividades en casa o fuera?",
-                        type: "option",
-                        options: [
-                            {
-                                id: 8,
-                                choice: "En casa",
-                                next: {
-                                    question: "¿Solo o con compañía?",
+                    id: "traditional",
+                    name: "Enfoque Tradicional",
+                    description: "Metodología en cascada (Waterfall)",
+                    type: "option",
+                    children: [
+                        {
+                            id: "detailed_planning",
+                            name: "Planificación Detallada",
+                            description: "Documentación exhaustiva antes de comenzar",
+                            type: "option",
+                            children: [
+                                {
+                                    id: "strict_phases",
+                                    name: "Fases Estrictas",
+                                    description: "Secuencia lineal de fases",
                                     type: "option",
-                                    options: [
+                                    children: [
                                         {
-                                            id: 9,
-                                            choice: "Solo",
-                                            result: "Maratón de películas con tus favoritas. Prepara palomitas.",
-                                            type: "result"
-                                        },
+                                            id: "result5",
+                                            name: "Resultado Predecible",
+                                            description: "Proyecto entregado según lo planeado, pero sin flexibilidad",
+                                            type: "result",
+                                            risk: "Bajo",
+                                            success: "Medio"
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "flexible_phases",
+                                    name: "Fases Flexibles",
+                                    description: "Alguna adaptación entre fases",
+                                    type: "option",
+                                    children: [
                                         {
-                                            id: 10,
-                                            choice: "Con compañía",
-                                            result: "Noche de juegos de mesa con amigos. Pide pizza.",
-                                            type: "result"
+                                            id: "result6",
+                                            name: "Control con Adaptación",
+                                            description: "Balance entre estructura y adaptabilidad",
+                                            type: "result",
+                                            risk: "Medio",
+                                            success: "Medio"
                                         }
                                     ]
                                 }
-                            },
-                            {
-                                id: 11,
-                                choice: "Fuera de casa",
-                                result: "Visita un museo o galería de arte. Aprovecha el día cultural.",
-                                type: "result"
-                            }
-                        ]
-                    }
+                            ]
+                        },
+                        {
+                            id: "moderate_planning",
+                            name: "Planificación Moderada",
+                            description: "Documentación esencial, detalles emergentes",
+                            type: "option",
+                            children: [
+                                {
+                                    id: "stage_gates",
+                                    name: "Revisiones por Etapas",
+                                    description: "Puntos de control entre fases",
+                                    type: "option",
+                                    children: [
+                                        {
+                                            id: "result7",
+                                            name: "Progreso Controlado",
+                                            description: "Avance constante con monitoreo regular",
+                                            type: "result",
+                                            risk: "Medio",
+                                            success: "Alto"
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "incremental",
+                                    name: "Entrega Incremental",
+                                    description: "Entregas parciales del proyecto",
+                                    type: "option",
+                                    children: [
+                                        {
+                                            id: "result8",
+                                            name: "Retroalimentación Temprana",
+                                            description: "Aprendizaje continuo y ajustes progresivos",
+                                            type: "result",
+                                            risk: "Bajo",
+                                            success: "Alto"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    id: 12,
-                    choice: "Nublado",
-                    next: {
-                        question: "¿Tienes energía para algo activo?",
-                        type: "option",
-                        options: [
-                            {
-                                id: 13,
-                                choice: "Sí",
-                                result: "Ve a dar un paseo en bicicleta por la ciudad. Explora nuevos lugares.",
-                                type: "result"
-                            },
-                            {
-                                id: 14,
-                                choice: "No",
-                                next: {
-                                    question: "¿Quieres aprender algo nuevo?",
+                    id: "radical",
+                    name: "Enfoque Radical",
+                    description: "Metodologías disruptivas e innovadoras",
+                    type: "option",
+                    children: [
+                        {
+                            id: "design_thinking",
+                            name: "Design Thinking",
+                            description: "Centrado en el usuario y prototipado rápido",
+                            type: "option",
+                            children: [
+                                {
+                                    id: "rapid_prototyping",
+                                    name: "Prototipado Rápido",
+                                    description: "Iteraciones muy rápidas de diseño",
                                     type: "option",
-                                    options: [
+                                    children: [
                                         {
-                                            id: 15,
-                                            choice: "Sí",
-                                            result: "Toma un taller de cocina o arte. Desarrolla una nueva habilidad.",
-                                            type: "result"
-                                        },
+                                            id: "result9",
+                                            name: "Innovación Exitosa",
+                                            description: "Solución altamente innovadora y centrada en usuario",
+                                            type: "result",
+                                            risk: "Alto",
+                                            success: "Alto"
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "user_centric",
+                                    name: "Totalmente Centrado en Usuario",
+                                    description: "Todo gira alrededor de la experiencia de usuario",
+                                    type: "option",
+                                    children: [
                                         {
-                                            id: 16,
-                                            choice: "No",
-                                            result: "Lee un buen libro en una cafetería acogedora. Disfruta un café.",
-                                            type: "result"
+                                            id: "result10",
+                                            name: "Experiencia Excepcional",
+                                            description: "Producto con experiencia de usuario sobresaliente",
+                                            type: "result",
+                                            risk: "Medio",
+                                            success: "Alto"
                                         }
                                     ]
                                 }
-                            }
-                        ]
-                    }
+                            ]
+                        },
+                        {
+                            id: "lean_startup",
+                            name: "Lean Startup",
+                            description: "Construir-medir-aprender, MVP",
+                            type: "option",
+                            children: [
+                                {
+                                    id: "mvp_focus",
+                                    name: "MVP Mínimo",
+                                    description: "Producto mínimo viable extremo",
+                                    type: "option",
+                                    children: [
+                                        {
+                                            id: "result11",
+                                            name: "Validación Rápida",
+                                            description: "Aprendizaje acelerado sobre viabilidad",
+                                            type: "result",
+                                            risk: "Medio",
+                                            success: "Medio"
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: "pivot_readiness",
+                                    name: "Preparado para Pivotar",
+                                    description: "Equipo flexible para cambios radicales",
+                                    type: "option",
+                                    children: [
+                                        {
+                                            id: "result12",
+                                            name: "Adaptación Extrema",
+                                            description: "Capacidad de cambiar dirección completamente si es necesario",
+                                            type: "result",
+                                            risk: "Alto",
+                                            success: "Medio"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         };
 
         // Variables de estado
-        let currentStep = decisionTree;
-        let decisionPath = [];
-        let isDecisionComplete = false;
-
-        // Elementos del DOM
-        const treeContainer = document.getElementById('decisionTree');
-        const decisionPathContainer = document.getElementById('decisionPath');
-        const currentDecisionElement = document.getElementById('currentDecision');
-        const startBtn = document.getElementById('startBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const exampleBtn = document.getElementById('exampleBtn');
-
-        // Función para renderizar el árbol
-        function renderTree() {
-            treeContainer.innerHTML = '';
-            
-            // Si no hay decisión en curso, mostrar el árbol completo
-            if (!currentStep || currentStep.type === 'root') {
-                renderFullTree(decisionTree, treeContainer);
-            } else {
-                // Mostrar solo el camino actual
-                renderCurrentPath();
-            }
-        }
-
-        // Función para renderizar el árbol completo
-        function renderFullTree(node, container, level = 0) {
-            // Crear nivel del árbol
-            const levelDiv = document.createElement('div');
-            levelDiv.className = 'tree-level';
-            
-            // Crear nodo
-            const nodeDiv = document.createElement('div');
-            nodeDiv.className = `tree-node ${node.type}`;
-            nodeDiv.dataset.id = node.id;
-            
-            // Contenido del nodo
-            nodeDiv.innerHTML = `
-                <div class="node-title">${node.question || 'Resultado'}</div>
-                <div class="node-content">${node.result || 'Haz una selección'}</div>
-            `;
-            
-            // Si es un nodo de opción (no resultado), hacerlo clickeable
-            if (node.type !== 'result') {
-                nodeDiv.style.cursor = 'pointer';
-                nodeDiv.addEventListener('click', () => handleNodeClick(node));
-            }
-            
-            levelDiv.appendChild(nodeDiv);
-            container.appendChild(levelDiv);
-            
-            // Si hay opciones, renderizarlas en el siguiente nivel
-            if (node.options) {
-                node.options.forEach(option => {
-                    // Renderizar la opción
-                    const optionLevelDiv = document.createElement('div');
-                    optionLevelDiv.className = 'tree-level';
-                    
-                    const optionDiv = document.createElement('div');
-                    optionDiv.className = 'tree-node option';
-                    optionDiv.dataset.id = option.id;
-                    
-                    optionDiv.innerHTML = `
-                        <div class="node-title">Opción</div>
-                        <div class="node-content">${option.choice}</div>
-                    `;
-                    
-                    optionDiv.style.cursor = 'pointer';
-                    optionDiv.addEventListener('click', () => handleOptionClick(option));
-                    
-                    optionLevelDiv.appendChild(optionDiv);
-                    container.appendChild(optionLevelDiv);
-                    
-                    // Renderizar el siguiente nodo si existe
-                    if (option.next) {
-                        renderFullTree(option.next, container, level + 1);
-                    } else if (option.result) {
-                        // Si es un resultado directo
-                        const resultLevelDiv = document.createElement('div');
-                        resultLevelDiv.className = 'tree-level';
-                        
-                        const resultDiv = document.createElement('div');
-                        resultDiv.className = 'tree-node result';
-                        resultDiv.dataset.id = option.id + 100;
-                        
-                        resultDiv.innerHTML = `
-                            <div class="node-title">Resultado</div>
-                            <div class="node-content">${option.result}</div>
-                        `;
-                        
-                        resultLevelDiv.appendChild(resultDiv);
-                        container.appendChild(resultLevelDiv);
-                    }
-                });
-            }
-        }
-
-        // Función para renderizar solo el camino actual
-        function renderCurrentPath() {
-            treeContainer.innerHTML = '';
-            
-            // Renderizar el nodo raíz
-            const rootLevel = document.createElement('div');
-            rootLevel.className = 'tree-level';
-            
-            const rootNode = document.createElement('div');
-            rootNode.className = 'tree-node root';
-            rootNode.innerHTML = `
-                <div class="node-title">${decisionTree.question}</div>
-                <div class="node-content">Punto de partida</div>
-            `;
-            
-            rootLevel.appendChild(rootNode);
-            treeContainer.appendChild(rootLevel);
-            
-            // Renderizar el camino tomado
-            let currentNode = decisionTree;
-            let stepIndex = 0;
-            
-            while (stepIndex < decisionPath.length) {
-                const pathStep = decisionPath[stepIndex];
-                
-                // Encontrar la opción seleccionada
-                const selectedOption = currentNode.options.find(opt => opt.id === pathStep.optionId);
-                
-                if (selectedOption) {
-                    // Renderizar la opción seleccionada
-                    const optionLevel = document.createElement('div');
-                    optionLevel.className = 'tree-level';
-                    
-                    const optionNode = document.createElement('div');
-                    optionNode.className = 'tree-node option';
-                    optionNode.innerHTML = `
-                        <div class="node-title">Tu elección</div>
-                        <div class="node-content">${selectedOption.choice}</div>
-                    `;
-                    
-                    optionLevel.appendChild(optionNode);
-                    treeContainer.appendChild(optionLevel);
-                    
-                    // Si hay un siguiente nodo, renderizarlo
-                    if (selectedOption.next) {
-                        const nextLevel = document.createElement('div');
-                        nextLevel.className = 'tree-level';
-                        
-                        const nextNode = document.createElement('div');
-                        nextNode.className = `tree-node ${selectedOption.next.type}`;
-                        nextNode.innerHTML = `
-                            <div class="node-title">${selectedOption.next.question || 'Resultado'}</div>
-                            <div class="node-content">${selectedOption.next.result || 'Siguiente decisión'}</div>
-                        `;
-                        
-                        nextLevel.appendChild(nextNode);
-                        treeContainer.appendChild(nextLevel);
-                        
-                        currentNode = selectedOption.next;
-                    } else if (selectedOption.result) {
-                        // Si es un resultado
-                        const resultLevel = document.createElement('div');
-                        resultLevel.className = 'tree-level';
-                        
-                        const resultNode = document.createElement('div');
-                        resultNode.className = 'tree-node result';
-                        resultNode.innerHTML = `
-                            <div class="node-title">Resultado Final</div>
-                            <div class="node-content">${selectedOption.result}</div>
-                        `;
-                        
-                        resultLevel.appendChild(resultNode);
-                        treeContainer.appendChild(resultLevel);
-                    }
+        let currentPath = [];
+        let isDecisionActive = false;
+        let currentNode = null;
+        let zoomLevel = 1;
+        
+        // Configuración de D3
+        const margin = { top: 40, right: 120, bottom: 40, left: 120 };
+        const width = document.getElementById('treeVisualization').parentElement.clientWidth - margin.left - margin.right;
+        const height = 600 - margin.top - margin.bottom;
+        
+        // Crear SVG y grupos
+        const svg = d3.select("#treeVisualization")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+        
+        // Tooltip
+        const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+        
+        // Crear zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 3])
+            .on("zoom", (event) => {
+                svg.attr("transform", event.transform);
+                zoomLevel = event.transform.k;
+            });
+        
+        d3.select("#treeVisualization").call(zoom);
+        
+        // Layout del árbol
+        const treeLayout = d3.tree().size([height, width - 200]);
+        
+        // Raíz jerárquica
+        const root = d3.hierarchy(decisionTree);
+        
+        // Calcular layout
+        treeLayout(root);
+        
+        // Dibujar enlaces
+        const links = svg.selectAll(".link")
+            .data(root.links())
+            .enter().append("path")
+            .attr("class", "link")
+            .attr("d", d3.linkHorizontal()
+                .x(d => d.y)
+                .y(d => d.x))
+            .style("stroke-width", 2);
+        
+        // Dibujar nodos
+        const nodes = svg.selectAll(".node")
+            .data(root.descendants())
+            .enter().append("g")
+            .attr("class", d => `node ${d.data.type}`)
+            .attr("transform", d => `translate(${d.y},${d.x})`)
+            .on("click", handleNodeClick)
+            .on("mouseover", handleNodeMouseOver)
+            .on("mouseout", handleNodeMouseOut);
+        
+        // Añadir círculos a los nodos
+        nodes.append("circle")
+            .attr("r", 18)
+            .style("fill", d => {
+                switch(d.data.type) {
+                    case "root": return "#3498db";
+                    case "option": return "#2ecc71";
+                    case "result": return "#e74c3c";
+                    default: return "#95a5a6";
                 }
-                
-                stepIndex++;
-            }
-        }
-
-        // Función para actualizar el camino de decisión mostrado
-        function updateDecisionPath() {
-            decisionPathContainer.innerHTML = '';
-            
-            if (decisionPath.length === 0) {
-                decisionPathContainer.innerHTML = `
-                    <div class="path-step empty-path">
-                        <div class="step-number">?</div>
-                        <div>Haz clic en "Comenzar Decisión" para iniciar</div>
-                    </div>
-                `;
-                currentDecisionElement.textContent = "Esperando tu primera decisión...";
+            })
+            .style("stroke", d => {
+                switch(d.data.type) {
+                    case "root": return "#2980b9";
+                    case "option": return "#27ae60";
+                    case "result": return "#c0392b";
+                    default: return "#7f8c8d";
+                }
+            })
+            .style("stroke-width", 3);
+        
+        // Añadir texto a los nodos
+        nodes.append("text")
+            .attr("dy", ".35em")
+            .attr("x", d => d.children ? -22 : 22)
+            .style("text-anchor", d => d.children ? "end" : "start")
+            .text(d => d.data.name)
+            .style("font-size", "14px")
+            .style("fill", "#2c3e50");
+        
+        // Añadir iconos según tipo de nodo
+        nodes.append("text")
+            .attr("dy", ".35em")
+            .attr("x", 0)
+            .attr("y", -5)
+            .style("text-anchor", "middle")
+            .style("font-family", "FontAwesome")
+            .style("font-size", "12px")
+            .style("fill", "white")
+            .text(d => {
+                switch(d.data.type) {
+                    case "root": return "\uf0e8"; // fa-sitemap
+                    case "option": return "\uf0a9"; // fa-hand-o-right
+                    case "result": return "\uf00c"; // fa-check
+                    default: return "\uf111"; // fa-circle
+                }
+            });
+        
+        // Actualizar estadísticas
+        updateStats();
+        
+        // Funciones de manejo de eventos
+        function handleNodeClick(event, d) {
+            if (!isDecisionActive && d.data.type !== "root") {
+                showMessage("Primero inicia una decisión con el botón 'Iniciar Decisión'", "info");
                 return;
             }
             
-            // Mostrar cada paso del camino
-            decisionPath.forEach((step, index) => {
-                const stepDiv = document.createElement('div');
-                stepDiv.className = 'path-step';
+            // Si no es una opción o resultado, no hacer nada
+            if (d.data.type !== "option" && d.data.type !== "result") return;
+            
+            // Verificar que el nodo sea hijo del nodo actual
+            if (currentNode && !isDescendantOf(currentNode, d)) {
+                showMessage("Debes seguir el camino del árbol. Selecciona una opción del nodo actual.", "warning");
+                return;
+            }
+            
+            // Añadir al camino
+            currentPath.push({
+                id: d.data.id,
+                name: d.data.name,
+                description: d.data.description,
+                type: d.data.type
+            });
+            
+            // Actualizar nodo actual
+            currentNode = d;
+            
+            // Resaltar camino
+            highlightPath();
+            
+            // Actualizar interfaz
+            updateDecisionPath();
+            updateCurrentDecision();
+            
+            // Si es resultado, finalizar decisión
+            if (d.data.type === "result") {
+                isDecisionActive = false;
+                showMessage(`¡Decisión completada! Resultado: ${d.data.name}. Riesgo: ${d.data.risk}, Éxito: ${d.data.success}`, "success");
+            }
+            
+            updateStats();
+        }
+        
+        function handleNodeMouseOver(event, d) {
+            // Mostrar tooltip
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            
+            let tooltipContent = `<strong>${d.data.name}</strong><br/>${d.data.description}`;
+            
+            if (d.data.type === "result") {
+                tooltipContent += `<br/><br/><strong>Riesgo:</strong> ${d.data.risk}<br/><strong>Probabilidad de éxito:</strong> ${d.data.success}`;
+            }
+            
+            tooltip.html(tooltipContent)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+            
+            // Resaltar nodo
+            d3.select(this).select("circle")
+                .style("filter", "drop-shadow(0 0 5px rgba(52, 152, 219, 0.7))");
+        }
+        
+        function handleNodeMouseOut() {
+            // Ocultar tooltip
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", 0);
+            
+            // Quitar resaltado
+            d3.select(this).select("circle")
+                .style("filter", null);
+        }
+        
+        function isDescendantOf(parent, child) {
+            // Verificar si child es descendiente de parent
+            let node = child;
+            while (node) {
+                if (node === parent) return true;
+                node = node.parent;
+            }
+            return false;
+        }
+        
+        function highlightPath() {
+            // Resetear todos los estilos
+            d3.selectAll(".link").classed("active", false);
+            d3.selectAll(".node").classed("active", false);
+            
+            // Resaltar camino actual
+            if (currentPath.length > 0) {
+                // Encontrar nodos en el camino
+                const nodeIds = currentPath.map(step => step.id);
                 
-                stepDiv.innerHTML = `
-                    <div class="step-number">${index + 1}</div>
-                    <div><strong>${step.question}</strong> → Elegiste: <em>${step.choice}</em></div>
+                // Resaltar nodos
+                d3.selectAll(".node")
+                    .filter(d => nodeIds.includes(d.data.id))
+                    .classed("active", true)
+                    .select("circle")
+                    .style("filter", "drop-shadow(0 0 8px rgba(243, 156, 18, 0.8))");
+                
+                // Resaltar enlaces entre nodos del camino
+                // Esto es más complejo y requiere recorrer la jerarquía
+                // Para simplificar, resaltamos todos los enlaces por ahora
+            }
+        }
+        
+        function updateDecisionPath() {
+            const pathContainer = document.getElementById("decisionPath");
+            
+            if (currentPath.length === 0) {
+                pathContainer.innerHTML = `
+                    <div class="path-step">
+                        <div class="step-number">?</div>
+                        <div class="step-content">
+                            <div class="step-question">Sin decisiones tomadas aún</div>
+                            <div class="step-choice">Selecciona una opción en el árbol para comenzar</div>
+                        </div>
+                    </div>
                 `;
-                
-                decisionPathContainer.appendChild(stepDiv);
+                return;
+            }
+            
+            let pathHTML = "";
+            
+            currentPath.forEach((step, index) => {
+                pathHTML += `
+                    <div class="path-step">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-content">
+                            <div class="step-question">${step.name}</div>
+                            <div class="step-choice">${step.description}</div>
+                        </div>
+                    </div>
+                `;
             });
             
-            // Mostrar la decisión actual
-            if (isDecisionComplete) {
-                currentDecisionElement.innerHTML = `<i class="fas fa-flag-checkered"></i> <strong>Decisión completa:</strong> ${currentStep.result}`;
+            pathContainer.innerHTML = pathHTML;
+            pathContainer.scrollTop = pathContainer.scrollHeight;
+        }
+        
+        function updateCurrentDecision() {
+            const currentDecisionElement = document.getElementById("currentDecision");
+            
+            if (!isDecisionActive) {
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Estado:</strong> Esperando inicio de decisión. Haz clic en "Iniciar Decisión" para comenzar.
+                    </div>
+                `;
+                return;
+            }
+            
+            if (currentPath.length === 0) {
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-play-circle"></i> 
+                        <strong>Decisión iniciada:</strong> Selecciona tu primer paso en el árbol de decisiones.
+                    </div>
+                `;
+                return;
+            }
+            
+            const lastStep = currentPath[currentPath.length - 1];
+            
+            if (lastStep.type === "result") {
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-flag-checkered"></i> 
+                        <strong>Decisión completada:</strong> Has llegado al resultado final: 
+                        <span class="result-text">"${lastStep.name}"</span>
+                    </div>
+                `;
             } else {
-                currentDecisionElement.innerHTML = `<i class="fas fa-question-circle"></i> <strong>Decisión actual:</strong> ${currentStep.question}`;
+                currentDecisionElement.innerHTML = `
+                    <div class="decision-text">
+                        <i class="fas fa-question-circle"></i> 
+                        <strong>Paso actual:</strong> "${lastStep.name}". 
+                        <strong>Descripción:</strong> ${lastStep.description}
+                    </div>
+                `;
             }
         }
-
-        // Manejo de clic en un nodo (para comenzar o continuar)
-        function handleNodeClick(node) {
-            if (isDecisionComplete) return;
-            
-            currentStep = node;
-            updateDecisionPath();
-            renderTree();
-        }
-
-        // Manejo de clic en una opción
-        function handleOptionClick(option) {
-            if (isDecisionComplete) return;
-            
-            // Registrar el paso en el camino
-            decisionPath.push({
-                question: currentStep.question,
-                choice: option.choice,
-                optionId: option.id
-            });
-            
-            // Si la opción lleva a un resultado
-            if (option.result) {
-                currentStep = { result: option.result, type: 'result' };
-                isDecisionComplete = true;
-            } 
-            // Si la opción lleva a otra decisión
-            else if (option.next) {
-                currentStep = option.next;
-            }
-            
-            updateDecisionPath();
-            renderTree();
-        }
-
-        // Función para comenzar una nueva decisión
-        function startDecision() {
-            currentStep = decisionTree;
-            decisionPath = [];
-            isDecisionComplete = false;
-            updateDecisionPath();
-            renderTree();
-            
-            // Actualizar texto del botón
-            startBtn.innerHTML = '<i class="fas fa-forward"></i> Continuar Decisión';
-            startBtn.disabled = true;
-            setTimeout(() => {
-                startBtn.disabled = false;
-            }, 500);
-        }
-
-        // Función para reiniciar completamente
-        function resetDecision() {
-            currentStep = null;
-            decisionPath = [];
-            isDecisionComplete = false;
-            updateDecisionPath();
-            renderTree();
-            
-            // Restaurar texto del botón
-            startBtn.innerHTML = '<i class="fas fa-play-circle"></i> Comenzar Decisión';
-        }
-
-        // Función para mostrar un ejemplo completo
-        function showExample() {
-            resetDecision();
-            
-            // Simular un camino de decisión completo
-            setTimeout(() => {
-                startDecision();
-                
-                // Primer paso: Clima soleado
-                setTimeout(() => {
-                    const sunnyOption = decisionTree.options.find(opt => opt.choice === "Soleado");
-                    handleOptionClick(sunnyOption);
-                    
-                    // Segundo paso: Sí, actividades al aire libre
-                    setTimeout(() => {
-                        const outdoorOption = sunnyOption.next.options.find(opt => opt.choice === "Sí");
-                        handleOptionClick(outdoorOption);
-                        
-                        // Tercer paso: Prefiere playa
-                        setTimeout(() => {
-                            const beachOption = outdoorOption.next.options.find(opt => opt.choice === "Playa");
-                            handleOptionClick(beachOption);
-                        }, 800);
-                    }, 800);
-                }, 800);
-            }, 500);
-        }
-
-        // Inicializar eventos
-        startBtn.addEventListener('click', startDecision);
-        resetBtn.addEventListener('click', resetDecision);
-        exampleBtn.addEventListener('click', showExample);
-
-        // Inicializar la visualización
-        renderTree();
-        updateDecisionPath();
-    </script>
-</body>
-</html>
+        
