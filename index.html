@@ -39,10 +39,6 @@
             color: #2c3e50;
             margin-bottom: 10px;
             font-size: 2.8rem;
-            background: linear-gradient(to right, #3498db, #2ecc71);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
         }
         
         .subtitle {
@@ -72,6 +68,7 @@
             padding: 25px;
             position: relative;
             overflow: hidden;
+            min-height: 700px;
         }
         
         .tree-section::before {
@@ -108,10 +105,9 @@
             position: relative;
         }
         
-        #treeVisualization {
+        .tree-wrapper {
             width: 100%;
-            height: 100%;
-            min-height: 600px;
+            height: 600px;
             position: relative;
         }
         
@@ -312,66 +308,76 @@
             font-size: 0.95rem;
         }
         
-        /* Estilos para nodos del árbol */
-        .node {
+        /* Estilos para el árbol personalizado */
+        .tree-node {
+            position: absolute;
+            padding: 12px 18px;
+            border-radius: 10px;
+            min-width: 180px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 10;
         }
         
-        .node circle {
-            stroke-width: 3px;
+        .tree-node:hover {
+            transform: scale(1.05);
+            z-index: 20;
         }
         
-        .node text {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .node.root circle {
-            fill: #3498db;
-            stroke: #2980b9;
-        }
-        
-        .node.option circle {
-            fill: #2ecc71;
-            stroke: #27ae60;
-        }
-        
-        .node.result circle {
-            fill: #e74c3c;
-            stroke: #c0392b;
-        }
-        
-        .node.active circle {
-            fill: #f39c12;
-            stroke: #e67e22;
-            filter: drop-shadow(0 0 5px rgba(243, 156, 18, 0.7));
-        }
-        
-        .link {
-            fill: none;
-            stroke: #95a5a6;
-            stroke-width: 2px;
-        }
-        
-        .link.active {
-            stroke: #3498db;
-            stroke-width: 3px;
-        }
-        
-        /* Tooltip personalizado */
-        .tooltip {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.85);
+        .tree-node.root {
+            background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            pointer-events: none;
-            z-index: 100;
-            max-width: 300px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 3px solid #2980b9;
+        }
+        
+        .tree-node.option {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: 3px solid #27ae60;
+        }
+        
+        .tree-node.result {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: 3px solid #c0392b;
+        }
+        
+        .tree-node.active {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-color: #e67e22;
+            box-shadow: 0 0 0 5px rgba(243, 156, 18, 0.3);
+        }
+        
+        .node-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .node-desc {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .tree-connector {
+            position: absolute;
+            background-color: #95a5a6;
+            z-index: 1;
+        }
+        
+        .tree-connector.horizontal {
+            height: 3px;
+        }
+        
+        .tree-connector.vertical {
+            width: 3px;
+        }
+        
+        .tree-connector.active {
+            background-color: #3498db;
+            box-shadow: 0 0 5px #3498db;
         }
         
         .tree-stats {
@@ -399,6 +405,20 @@
             color: #7f8c8d;
             margin-top: 5px;
         }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 100;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -416,7 +436,9 @@
                 </div>
                 
                 <div class="tree-container">
-                    <svg id="treeVisualization" width="100%" height="100%"></svg>
+                    <div class="tree-wrapper" id="treeVisualization">
+                        <!-- El árbol se generará aquí -->
+                    </div>
                 </div>
                 
                 <div class="tree-stats">
@@ -511,35 +533,36 @@
         </footer>
     </div>
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <div class="tooltip" id="nodeTooltip"></div>
+
     <script>
         // Estructura del árbol de decisiones más complejo
         const decisionTree = {
             id: "root",
             name: "Inicio de Proyecto",
-            description: "Decide cómo abordar un nuevo proyecto",
+            description: "Decide cómo abordar un nuevo proyecto empresarial",
             type: "root",
             children: [
                 {
-                    id: "approach",
+                    id: "approach_agile",
                     name: "Enfoque Ágil",
                     description: "Metodología iterativa e incremental",
                     type: "option",
                     children: [
                         {
-                            id: "agile_team",
+                            id: "agile_team_small",
                             name: "Equipo Pequeño",
                             description: "Equipo de 3-5 personas",
                             type: "option",
                             children: [
                                 {
-                                    id: "small_sprints",
+                                    id: "sprints_short",
                                     name: "Sprints Cortos",
                                     description: "Iteraciones de 1-2 semanas",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result1",
+                                            id: "result_agile_success",
                                             name: "Alta Adaptabilidad",
                                             description: "Proyecto exitoso con capacidad de adaptación a cambios",
                                             type: "result",
@@ -549,13 +572,13 @@
                                     ]
                                 },
                                 {
-                                    id: "medium_sprints",
+                                    id: "sprints_medium",
                                     name: "Sprints Medios",
                                     description: "Iteraciones de 3-4 semanas",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result2",
+                                            id: "result_agile_stable",
                                             name: "Resultado Estable",
                                             description: "Proyecto entregado con funcionalidades sólidas",
                                             type: "result",
@@ -567,19 +590,19 @@
                             ]
                         },
                         {
-                            id: "agile_large_team",
+                            id: "agile_team_large",
                             name: "Equipo Grande",
                             description: "Equipo de 6-10 personas",
                             type: "option",
                             children: [
                                 {
-                                    id: "scaled_agile",
+                                    id: "scaled_framework",
                                     name: "Agile Escalado",
                                     description: "Framework SAFe o LeSS",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result3",
+                                            id: "result_agile_complex",
                                             name: "Complejidad Controlada",
                                             description: "Proyecto complejo gestionado efectivamente",
                                             type: "result",
@@ -595,7 +618,7 @@
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result4",
+                                            id: "result_agile_flex",
                                             name: "Flexibilidad Moderada",
                                             description: "Resultados variables dependiendo de la integración",
                                             type: "result",
@@ -609,25 +632,25 @@
                     ]
                 },
                 {
-                    id: "traditional",
+                    id: "approach_traditional",
                     name: "Enfoque Tradicional",
                     description: "Metodología en cascada (Waterfall)",
                     type: "option",
                     children: [
                         {
-                            id: "detailed_planning",
+                            id: "planning_detailed",
                             name: "Planificación Detallada",
                             description: "Documentación exhaustiva antes de comenzar",
                             type: "option",
                             children: [
                                 {
-                                    id: "strict_phases",
+                                    id: "phases_strict",
                                     name: "Fases Estrictas",
                                     description: "Secuencia lineal de fases",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result5",
+                                            id: "result_trad_predictable",
                                             name: "Resultado Predecible",
                                             description: "Proyecto entregado según lo planeado, pero sin flexibilidad",
                                             type: "result",
@@ -637,13 +660,13 @@
                                     ]
                                 },
                                 {
-                                    id: "flexible_phases",
+                                    id: "phases_flexible",
                                     name: "Fases Flexibles",
                                     description: "Alguna adaptación entre fases",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result6",
+                                            id: "result_trad_balanced",
                                             name: "Control con Adaptación",
                                             description: "Balance entre estructura y adaptabilidad",
                                             type: "result",
@@ -655,7 +678,7 @@
                             ]
                         },
                         {
-                            id: "moderate_planning",
+                            id: "planning_moderate",
                             name: "Planificación Moderada",
                             description: "Documentación esencial, detalles emergentes",
                             type: "option",
@@ -667,7 +690,7 @@
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result7",
+                                            id: "result_trad_progress",
                                             name: "Progreso Controlado",
                                             description: "Avance constante con monitoreo regular",
                                             type: "result",
@@ -677,13 +700,13 @@
                                     ]
                                 },
                                 {
-                                    id: "incremental",
+                                    id: "incremental_delivery",
                                     name: "Entrega Incremental",
                                     description: "Entregas parciales del proyecto",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result8",
+                                            id: "result_trad_feedback",
                                             name: "Retroalimentación Temprana",
                                             description: "Aprendizaje continuo y ajustes progresivos",
                                             type: "result",
@@ -697,7 +720,7 @@
                     ]
                 },
                 {
-                    id: "radical",
+                    id: "approach_radical",
                     name: "Enfoque Radical",
                     description: "Metodologías disruptivas e innovadoras",
                     type: "option",
@@ -715,7 +738,7 @@
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result9",
+                                            id: "result_radical_innovative",
                                             name: "Innovación Exitosa",
                                             description: "Solución altamente innovadora y centrada en usuario",
                                             type: "result",
@@ -731,7 +754,7 @@
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result10",
+                                            id: "result_radical_experience",
                                             name: "Experiencia Excepcional",
                                             description: "Producto con experiencia de usuario sobresaliente",
                                             type: "result",
@@ -749,13 +772,13 @@
                             type: "option",
                             children: [
                                 {
-                                    id: "mvp_focus",
+                                    id: "mvp_minimal",
                                     name: "MVP Mínimo",
                                     description: "Producto mínimo viable extremo",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result11",
+                                            id: "result_radical_validation",
                                             name: "Validación Rápida",
                                             description: "Aprendizaje acelerado sobre viabilidad",
                                             type: "result",
@@ -765,13 +788,13 @@
                                     ]
                                 },
                                 {
-                                    id: "pivot_readiness",
+                                    id: "pivot_ready",
                                     name: "Preparado para Pivotar",
                                     description: "Equipo flexible para cambios radicales",
                                     type: "option",
                                     children: [
                                         {
-                                            id: "result12",
+                                            id: "result_radical_adaptation",
                                             name: "Adaptación Extrema",
                                             description: "Capacidad de cambiar dirección completamente si es necesario",
                                             type: "result",
@@ -791,141 +814,175 @@
         let currentPath = [];
         let isDecisionActive = false;
         let currentNode = null;
-        let zoomLevel = 1;
-        
-        // Configuración de D3
-        const margin = { top: 40, right: 120, bottom: 40, left: 120 };
-        const width = document.getElementById('treeVisualization').parentElement.clientWidth - margin.left - margin.right;
-        const height = 600 - margin.top - margin.bottom;
-        
-        // Crear SVG y grupos
-        const svg = d3.select("#treeVisualization")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-        
-        // Tooltip
-        const tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-        
-        // Crear zoom behavior
-        const zoom = d3.zoom()
-            .scaleExtent([0.1, 3])
-            .on("zoom", (event) => {
-                svg.attr("transform", event.transform);
-                zoomLevel = event.transform.k;
+        let scale = 1;
+        let offsetX = 0, offsetY = 0;
+        let nodeElements = [];
+        let connectorElements = [];
+
+        // Elementos del DOM
+        const treeContainer = document.getElementById('treeVisualization');
+        const nodeTooltip = document.getElementById('nodeTooltip');
+
+        // Inicializar el árbol
+        function initTree() {
+            // Limpiar el contenedor
+            treeContainer.innerHTML = '';
+            nodeElements = [];
+            connectorElements = [];
+            
+            // Calcular dimensiones
+            const containerWidth = treeContainer.clientWidth;
+            const containerHeight = treeContainer.clientHeight;
+            
+            // Posicionar nodo raíz
+            const rootX = containerWidth / 2;
+            const rootY = 80;
+            
+            // Crear nodo raíz
+            createTreeNode(decisionTree, rootX, rootY, 0);
+            
+            // Renderizar recursivamente
+            renderTreeNodes(decisionTree, rootX, rootY, 0, containerWidth);
+            
+            // Dibujar conectores después de crear todos los nodos
+            drawConnectors();
+            
+            // Actualizar estadísticas
+            updateStats();
+            
+            // Aplicar transformación inicial
+            updateTreeTransform();
+        }
+
+        // Crear un nodo del árbol
+        function createTreeNode(node, x, y, level) {
+            const nodeElement = document.createElement('div');
+            nodeElement.className = `tree-node ${node.type}`;
+            nodeElement.id = `node-${node.id}`;
+            nodeElement.style.left = `${x}px`;
+            nodeElement.style.top = `${y}px`;
+            
+            nodeElement.innerHTML = `
+                <div class="node-title">${node.name}</div>
+                <div class="node-desc">${node.description.substring(0, 40)}${node.description.length > 40 ? '...' : ''}</div>
+            `;
+            
+            // Añadir eventos
+            nodeElement.addEventListener('click', () => handleNodeClick(node));
+            nodeElement.addEventListener('mouseenter', (e) => showNodeTooltip(node, e));
+            nodeElement.addEventListener('mouseleave', hideNodeTooltip);
+            
+            treeContainer.appendChild(nodeElement);
+            nodeElements.push({
+                element: nodeElement,
+                node: node,
+                x: x,
+                y: y,
+                width: 180,
+                height: 70
             });
-        
-        d3.select("#treeVisualization").call(zoom);
-        
-        // Layout del árbol
-        const treeLayout = d3.tree().size([height, width - 200]);
-        
-        // Raíz jerárquica
-        const root = d3.hierarchy(decisionTree);
-        
-        // Calcular layout
-        treeLayout(root);
-        
-        // Dibujar enlaces
-        const links = svg.selectAll(".link")
-            .data(root.links())
-            .enter().append("path")
-            .attr("class", "link")
-            .attr("d", d3.linkHorizontal()
-                .x(d => d.y)
-                .y(d => d.x))
-            .style("stroke-width", 2);
-        
-        // Dibujar nodos
-        const nodes = svg.selectAll(".node")
-            .data(root.descendants())
-            .enter().append("g")
-            .attr("class", d => `node ${d.data.type}`)
-            .attr("transform", d => `translate(${d.y},${d.x})`)
-            .on("click", handleNodeClick)
-            .on("mouseover", handleNodeMouseOver)
-            .on("mouseout", handleNodeMouseOut);
-        
-        // Añadir círculos a los nodos
-        nodes.append("circle")
-            .attr("r", 18)
-            .style("fill", d => {
-                switch(d.data.type) {
-                    case "root": return "#3498db";
-                    case "option": return "#2ecc71";
-                    case "result": return "#e74c3c";
-                    default: return "#95a5a6";
-                }
-            })
-            .style("stroke", d => {
-                switch(d.data.type) {
-                    case "root": return "#2980b9";
-                    case "option": return "#27ae60";
-                    case "result": return "#c0392b";
-                    default: return "#7f8c8d";
-                }
-            })
-            .style("stroke-width", 3);
-        
-        // Añadir texto a los nodos
-        nodes.append("text")
-            .attr("dy", ".35em")
-            .attr("x", d => d.children ? -22 : 22)
-            .style("text-anchor", d => d.children ? "end" : "start")
-            .text(d => d.data.name)
-            .style("font-size", "14px")
-            .style("fill", "#2c3e50");
-        
-        // Añadir iconos según tipo de nodo
-        nodes.append("text")
-            .attr("dy", ".35em")
-            .attr("x", 0)
-            .attr("y", -5)
-            .style("text-anchor", "middle")
-            .style("font-family", "FontAwesome")
-            .style("font-size", "12px")
-            .style("fill", "white")
-            .text(d => {
-                switch(d.data.type) {
-                    case "root": return "\uf0e8"; // fa-sitemap
-                    case "option": return "\uf0a9"; // fa-hand-o-right
-                    case "result": return "\uf00c"; // fa-check
-                    default: return "\uf111"; // fa-circle
+            
+            return nodeElement;
+        }
+
+        // Renderizar nodos recursivamente
+        function renderTreeNodes(node, parentX, parentY, level, availableWidth) {
+            if (!node.children || node.children.length === 0) return;
+            
+            const childCount = node.children.length;
+            const levelSpacing = 120;
+            const nodeSpacing = Math.min(220, availableWidth / childCount);
+            
+            // Calcular posición inicial para distribuir hijos
+            const startX = parentX - ((childCount - 1) * nodeSpacing) / 2;
+            
+            node.children.forEach((child, index) => {
+                const childX = startX + (index * nodeSpacing);
+                const childY = parentY + levelSpacing;
+                
+                createTreeNode(child, childX, childY, level + 1);
+                
+                // Renderizar hijos recursivamente
+                renderTreeNodes(child, childX, childY, level + 1, nodeSpacing);
+            });
+        }
+
+        // Dibujar conectores entre nodos
+        function drawConnectors() {
+            nodeElements.forEach(nodeItem => {
+                const node = nodeItem.node;
+                
+                if (node.children && node.children.length > 0) {
+                    node.children.forEach(child => {
+                        const childElement = nodeElements.find(n => n.node.id === child.id);
+                        if (childElement) {
+                            // Crear conector vertical
+                            const verticalConnector = document.createElement('div');
+                            verticalConnector.className = 'tree-connector vertical';
+                            
+                            const startY = nodeItem.y + 70; // Altura del nodo
+                            const endY = childElement.y - 10;
+                            const height = endY - startY;
+                            
+                            verticalConnector.style.left = `${nodeItem.x + 90}px`;
+                            verticalConnector.style.top = `${startY}px`;
+                            verticalConnector.style.height = `${height}px`;
+                            verticalConnector.style.width = '3px';
+                            
+                            treeContainer.appendChild(verticalConnector);
+                            connectorElements.push(verticalConnector);
+                            
+                            // Crear conector horizontal
+                            const horizontalConnector = document.createElement('div');
+                            horizontalConnector.className = 'tree-connector horizontal';
+                            
+                            const startX = nodeItem.x + 90;
+                            const endX = childElement.x + 90;
+                            const width = endX - startX;
+                            
+                            horizontalConnector.style.left = `${startX}px`;
+                            horizontalConnector.style.top = `${childElement.y - 10}px`;
+                            horizontalConnector.style.width = `${Math.abs(width)}px`;
+                            horizontalConnector.style.height = '3px';
+                            
+                            if (width < 0) {
+                                horizontalConnector.style.left = `${endX}px`;
+                            }
+                            
+                            treeContainer.appendChild(horizontalConnector);
+                            connectorElements.push(horizontalConnector);
+                        }
+                    });
                 }
             });
-        
-        // Actualizar estadísticas
-        updateStats();
-        
-        // Funciones de manejo de eventos
-        function handleNodeClick(event, d) {
-            if (!isDecisionActive && d.data.type !== "root") {
+        }
+
+        // Manejar clic en nodo
+        function handleNodeClick(node) {
+            if (!isDecisionActive && node.type !== "root") {
                 showMessage("Primero inicia una decisión con el botón 'Iniciar Decisión'", "info");
                 return;
             }
             
             // Si no es una opción o resultado, no hacer nada
-            if (d.data.type !== "option" && d.data.type !== "result") return;
+            if (node.type !== "option" && node.type !== "result") return;
             
-            // Verificar que el nodo sea hijo del nodo actual
-            if (currentNode && !isDescendantOf(currentNode, d)) {
+            // Verificar que el nodo sea hijo del nodo actual o sea el primer paso
+            if (currentNode && !isValidNextNode(currentNode, node)) {
                 showMessage("Debes seguir el camino del árbol. Selecciona una opción del nodo actual.", "warning");
                 return;
             }
             
             // Añadir al camino
             currentPath.push({
-                id: d.data.id,
-                name: d.data.name,
-                description: d.data.description,
-                type: d.data.type
+                id: node.id,
+                name: node.name,
+                description: node.description,
+                type: node.type
             });
             
             // Actualizar nodo actual
-            currentNode = d;
+            currentNode = node;
             
             // Resaltar camino
             highlightPath();
@@ -935,79 +992,88 @@
             updateCurrentDecision();
             
             // Si es resultado, finalizar decisión
-            if (d.data.type === "result") {
+            if (node.type === "result") {
                 isDecisionActive = false;
-                showMessage(`¡Decisión completada! Resultado: ${d.data.name}. Riesgo: ${d.data.risk}, Éxito: ${d.data.success}`, "success");
+                showMessage(`¡Decisión completada! Resultado: ${node.name}. Riesgo: ${node.risk}, Éxito: ${node.success}`, "success");
             }
             
             updateStats();
         }
-        
-        function handleNodeMouseOver(event, d) {
-            // Mostrar tooltip
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
+
+        // Verificar si el nodo es un siguiente paso válido
+        function isValidNextNode(currentNode, nextNode) {
+            // Si no hay nodo actual, cualquier nodo es válido
+            if (!currentNode) return true;
             
-            let tooltipContent = `<strong>${d.data.name}</strong><br/>${d.data.description}`;
-            
-            if (d.data.type === "result") {
-                tooltipContent += `<br/><br/><strong>Riesgo:</strong> ${d.data.risk}<br/><strong>Probabilidad de éxito:</strong> ${d.data.success}`;
+            // Buscar si el nextNode es hijo de currentNode en la estructura
+            function isChildOf(parentNode, childNode) {
+                if (!parentNode.children) return false;
+                
+                // Verificar hijos directos
+                if (parentNode.children.some(child => child.id === childNode.id)) {
+                    return true;
+                }
+                
+                // Verificar hijos recursivamente
+                for (let child of parentNode.children) {
+                    if (isChildOf(child, childNode)) {
+                        return true;
+                    }
+                }
+                
+                return false;
             }
             
-            tooltip.html(tooltipContent)
-                .style("left", (event.pageX + 10) + "px")
-                .style("top", (event.pageY - 28) + "px");
-            
-            // Resaltar nodo
-            d3.select(this).select("circle")
-                .style("filter", "drop-shadow(0 0 5px rgba(52, 152, 219, 0.7))");
+            return isChildOf(currentNode, nextNode);
         }
-        
-        function handleNodeMouseOut() {
-            // Ocultar tooltip
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", 0);
-            
-            // Quitar resaltado
-            d3.select(this).select("circle")
-                .style("filter", null);
-        }
-        
-        function isDescendantOf(parent, child) {
-            // Verificar si child es descendiente de parent
-            let node = child;
-            while (node) {
-                if (node === parent) return true;
-                node = node.parent;
-            }
-            return false;
-        }
-        
+
+        // Resaltar camino actual
         function highlightPath() {
-            // Resetear todos los estilos
-            d3.selectAll(".link").classed("active", false);
-            d3.selectAll(".node").classed("active", false);
+            // Remover resaltado previo
+            document.querySelectorAll('.tree-node.active').forEach(node => {
+                node.classList.remove('active');
+            });
             
-            // Resaltar camino actual
+            document.querySelectorAll('.tree-connector.active').forEach(connector => {
+                connector.classList.remove('active');
+            });
+            
+            // Resaltar nodos en el camino
+            currentPath.forEach(step => {
+                const nodeElement = document.getElementById(`node-${step.id}`);
+                if (nodeElement) {
+                    nodeElement.classList.add('active');
+                }
+            });
+            
+            // También resaltar nodo raíz si hay camino
             if (currentPath.length > 0) {
-                // Encontrar nodos en el camino
-                const nodeIds = currentPath.map(step => step.id);
-                
-                // Resaltar nodos
-                d3.selectAll(".node")
-                    .filter(d => nodeIds.includes(d.data.id))
-                    .classed("active", true)
-                    .select("circle")
-                    .style("filter", "drop-shadow(0 0 8px rgba(243, 156, 18, 0.8))");
-                
-                // Resaltar enlaces entre nodos del camino
-                // Esto es más complejo y requiere recorrer la jerarquía
-                // Para simplificar, resaltamos todos los enlaces por ahora
+                const rootElement = document.getElementById('node-root');
+                if (rootElement) {
+                    rootElement.classList.add('active');
+                }
             }
         }
-        
+
+        // Mostrar tooltip para nodo
+        function showNodeTooltip(node, event) {
+            let tooltipContent = `<strong>${node.name}</strong><br/>${node.description}`;
+            
+            if (node.type === "result") {
+                tooltipContent += `<br/><br/><strong>Riesgo:</strong> ${node.risk}<br/><strong>Probabilidad de éxito:</strong> ${node.success}`;
+            }
+            
+            nodeTooltip.innerHTML = tooltipContent;
+            nodeTooltip.style.display = 'block';
+            nodeTooltip.style.left = `${event.pageX + 10}px`;
+            nodeTooltip.style.top = `${event.pageY - 28}px`;
+        }
+
+        function hideNodeTooltip() {
+            nodeTooltip.style.display = 'none';
+        }
+
+        // Actualizar camino de decisión en la interfaz
         function updateDecisionPath() {
             const pathContainer = document.getElementById("decisionPath");
             
@@ -1038,51 +1104,4 @@
                 `;
             });
             
-            pathContainer.innerHTML = pathHTML;
-            pathContainer.scrollTop = pathContainer.scrollHeight;
-        }
-        
-        function updateCurrentDecision() {
-            const currentDecisionElement = document.getElementById("currentDecision");
-            
-            if (!isDecisionActive) {
-                currentDecisionElement.innerHTML = `
-                    <div class="decision-text">
-                        <i class="fas fa-info-circle"></i> 
-                        <strong>Estado:</strong> Esperando inicio de decisión. Haz clic en "Iniciar Decisión" para comenzar.
-                    </div>
-                `;
-                return;
-            }
-            
-            if (currentPath.length === 0) {
-                currentDecisionElement.innerHTML = `
-                    <div class="decision-text">
-                        <i class="fas fa-play-circle"></i> 
-                        <strong>Decisión iniciada:</strong> Selecciona tu primer paso en el árbol de decisiones.
-                    </div>
-                `;
-                return;
-            }
-            
-            const lastStep = currentPath[currentPath.length - 1];
-            
-            if (lastStep.type === "result") {
-                currentDecisionElement.innerHTML = `
-                    <div class="decision-text">
-                        <i class="fas fa-flag-checkered"></i> 
-                        <strong>Decisión completada:</strong> Has llegado al resultado final: 
-                        <span class="result-text">"${lastStep.name}"</span>
-                    </div>
-                `;
-            } else {
-                currentDecisionElement.innerHTML = `
-                    <div class="decision-text">
-                        <i class="fas fa-question-circle"></i> 
-                        <strong>Paso actual:</strong> "${lastStep.name}". 
-                        <strong>Descripción:</strong> ${lastStep.description}
-                    </div>
-                `;
-            }
-        }
-        
+            pathContainer.innerHTML
